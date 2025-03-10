@@ -48,4 +48,7 @@ INSERT INTO ITEMS (NAME, AREA, ORIGINAL_HOME, PRICE) VALUES ('ハイチコーヒ
 -- INSERT INTO ITEMS (NAME, AREA, ORIGINAL_HOME, PRICE) VALUES ('ブラジル', '南アメリカ', 'ブラジル', 500);
 -- INSERT INTO ITEMS (NAME, AREA, ORIGINAL_HOME, PRICE) VALUES ('エメラルドマウンテン', '南アメリカ', 'コロンビア', 800);
 
+SET foreign_key_checks = 1;	-- 外部キー制約を有効にする
+
 COMMIT;
+

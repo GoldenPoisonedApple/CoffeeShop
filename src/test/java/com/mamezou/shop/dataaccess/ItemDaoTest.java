@@ -43,7 +43,7 @@ public class ItemDaoTest {
 		sqlFileRunner.close();
 	}
 
-	/** テスト後処理 */
+	/** テスト前処理 */
 	@BeforeEach
 	public void setUpEach() throws DaoException {
 		// テスト対象クラス
