@@ -1,22 +1,14 @@
 package com.mamezou.shop.dataaccess;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
-import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.*;
-import org.mockito.MockedStatic;
-import org.mockito.MockitoAnnotations;
 
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.util.ApplicationProperties;
@@ -110,7 +102,7 @@ public class OrderDaoTest {
 	public void testRegister_02() throws Exception {
 		// できない
 
-		
+
 		// // 事前条件 なし
 
 		// // テスト用注文情報
