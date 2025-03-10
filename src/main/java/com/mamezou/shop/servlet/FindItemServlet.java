@@ -12,6 +12,7 @@ import com.mamezou.shop.dataaccess.ItemDao;
 import com.mamezou.shop.service.ItemManager;
 import com.mamezou.shop.service.ServiceException;
 import com.mamezou.shop.util.ApplicationProperties;
+import com.mamezou.shop.util.Environment;
 
 /**
  * 商品情報検索サーブレット
@@ -28,7 +29,7 @@ public class FindItemServlet extends HttpServlet {
 		String area = request.getParameter("area");
 
 		// 商品情報取得
-		ItemManager itemManeger = new ItemManager(new ItemDao(ApplicationProperties.getInstance()));
+		ItemManager itemManeger = new ItemManager(new ItemDao(ApplicationProperties.getInstance(Environment.PROD)));
 		try {
 			// リクエストパラメータに条件に合う商品情報格納
 			request.setAttribute("itemList", itemManeger.findByArea(area));

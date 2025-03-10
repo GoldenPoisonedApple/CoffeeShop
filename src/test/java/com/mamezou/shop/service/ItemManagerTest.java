@@ -12,6 +12,7 @@ import com.mamezou.shop.dataaccess.DaoException;
 import com.mamezou.shop.dataaccess.ItemDao;
 import com.mamezou.shop.entity.Item;
 import com.mamezou.shop.util.ApplicationProperties;
+import com.mamezou.shop.util.Environment;
 
 /**
  * ItemManagerクラスのテストクラス
@@ -58,7 +59,7 @@ public class ItemManagerTest {
 	}
 	private class ItemDaoStub01 extends ItemDao {
 		public ItemDaoStub01() {
-			super(ApplicationProperties.getInstance());
+			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
 		@Override
@@ -95,7 +96,7 @@ public class ItemManagerTest {
 	}
 	private class ItemDaoStub02 extends ItemDao {
 		public ItemDaoStub02() {
-			super(ApplicationProperties.getInstance());
+			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
 		@Override
@@ -129,7 +130,7 @@ public class ItemManagerTest {
 	}
 	private class ItemDaoStub03 extends ItemDao {
 		public ItemDaoStub03() {
-			super(ApplicationProperties.getInstance());
+			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
 		@Override
