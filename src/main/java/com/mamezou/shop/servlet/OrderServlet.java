@@ -8,9 +8,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import com.mamezou.shop.dataaccess.OrderDao;
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.service.OrderManager;
 import com.mamezou.shop.service.ServiceException;
+import com.mamezou.shop.util.ApplicationProperties;
 
 /**
  * 商品情報検索サーブレット
@@ -33,7 +35,7 @@ public class OrderServlet extends HttpServlet {
 		Order order = new Order(name, address, telNumber, itemId);
 
 		// 注文情報登録
-		OrderManager orderManager = new OrderManager();
+		OrderManager orderManager = new OrderManager(new OrderDao(ApplicationProperties.getInstance()));
 		int orderId = -1;
 		try {
 			orderId = orderManager.register(order);
