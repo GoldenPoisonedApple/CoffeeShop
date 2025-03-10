@@ -15,9 +15,9 @@ import com.mamezou.shop.util.ApplicationProperties;
 import com.mamezou.shop.util.Environment;
 
 /**
- * ItemManagerクラスのテストクラス
- * @see ItemManager
+ * {@link com.mamezou.shop.service.ItemManager} のテストクラス
  * {@link com.mamezou.shop.dataaccess.ItemDao} のスタブを作成、使用
+ * @author ito
  */
 public class ItemManagerTest {
 

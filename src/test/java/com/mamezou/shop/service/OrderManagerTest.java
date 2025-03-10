@@ -17,8 +17,9 @@ import com.mamezou.shop.dataaccess.DaoException;
 import com.mamezou.shop.dataaccess.OrderDao;
 
 /**
- * OrderManagerクラスのテストクラス
+ * {@link com.mamezou.shop.service.OrderManager} のテストクラス
  * {@link com.mamezou.shop.dataaccess.OrderDao} のスタブを作成、使用
+ * @author ito
  */
 public class OrderManagerTest {
 	/** モック化したDaoオブジェクト */
