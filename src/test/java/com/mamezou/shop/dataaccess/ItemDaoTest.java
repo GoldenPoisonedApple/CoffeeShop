@@ -1,12 +1,16 @@
 package com.mamezou.shop.dataaccess;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.jupiter.api.*;
+import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.*;
 
 import com.mamezou.shop.entity.Item;
 import com.mamezou.shop.util.ApplicationProperties;
@@ -19,7 +23,7 @@ import com.mamezou.shop.util.Environment;
  */
 public class ItemDaoTest {
 	/** テスト対象クラス */
-	private static ItemDao itemDao;
+	private ItemDao itemDao;
 	/** SQLファイルから実行 */
 	private static SqlFileRunner sqlFileRunner;
 
@@ -94,7 +98,27 @@ public class ItemDaoTest {
 	 * java.sql.SQLExceptionが発生した場合
 	 */
 	@Test
-	public void testSelectByArea_03() {
-		
+	public void testSelectByArea_03() throws Exception {
+		// スタブの作成
+		Connection conn = mock(Connection.class);
+		// スタブの動作を定義
+		try {
+			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
+		} catch (SQLException e) {
+			fail(e);
+		}
+
+		// テスト対象クラスにスタブを注入
+		// private変数のフィールドを取得
+		Field field = itemDao.getClass().getDeclaredField("conn");
+		// private変数へのアクセス制限を解除
+		field.setAccessible(true);
+		// private変数に値を設定
+		field.set(itemDao, conn);
+
+		// テスト対象メソッドを実行
+		Exception exception = assertThrows(DaoException.class, () -> itemDao.selectByArea("原産地1"));
+		assertTrue(exception.getMessage().contains("データベース関連エラー"));
 	}
+
 }

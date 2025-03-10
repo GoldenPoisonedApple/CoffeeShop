@@ -22,7 +22,7 @@ public class ItemDao implements AutoCloseable {
 	private static final String SELECT_BY_AREA_SQL = "SELECT * FROM ITEMS WHERE AREA = ?";
 
 	/** DB接続 */
-	Connection conn;
+	private Connection conn;
 
 	/**
 	 * コンストラクタ
