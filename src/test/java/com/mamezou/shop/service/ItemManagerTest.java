@@ -42,13 +42,13 @@ public class ItemManagerTest {
 	 * 検索結果が0件の場合
 	 */
 	@Test
-	public void testFindByArea_01() {
+	public void testFindByArea_01() throws DaoException {
 		// スタブを作成
 		ItemDao itemDao = new ItemDaoStub01();
-		ItemManager itemManager = new ItemManager(itemDao);
 		
 		// テスト対象メソッドを実行
-		try {
+		try (ItemManager itemManager = new ItemManager(itemDao)) {
+
 			List<Item> actual = itemManager.findByArea("テスト");
 			
 			// 結果検証
@@ -58,7 +58,7 @@ public class ItemManagerTest {
 
 	}
 	private class ItemDaoStub01 extends ItemDao {
-		public ItemDaoStub01() {
+		public ItemDaoStub01() throws DaoException {
 			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
@@ -73,13 +73,13 @@ public class ItemManagerTest {
 	 * 検索結果が1件以上の場合
 	 */
 	@Test
-	public void testFindByArea_02() {
+	public void testFindByArea_02() throws DaoException {
 		// スタブを作成
 		ItemDao itemDao = new ItemDaoStub02();
-		ItemManager itemManager = new ItemManager(itemDao);
 		
 		// テスト対象メソッドを実行
-		try {
+		try (ItemManager itemManager = new ItemManager(itemDao)) {
+
 			List<Item> actual = itemManager.findByArea("テスト");
 			
 			// 期待値作成
@@ -95,7 +95,7 @@ public class ItemManagerTest {
 
 	}
 	private class ItemDaoStub02 extends ItemDao {
-		public ItemDaoStub02() {
+		public ItemDaoStub02() throws DaoException {
 			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
@@ -113,13 +113,12 @@ public class ItemManagerTest {
 	 * DaoExceptionが発生した場合
 	 */
 	@Test
-	public void testFindByArea_03() {
+	public void testFindByArea_03() throws DaoException {
 		// スタブを作成
 		ItemDao itemDao = new ItemDaoStub03();
-		ItemManager itemManager = new ItemManager(itemDao);
 		
 		// テスト対象メソッドを実行
-		try {
+		try (ItemManager itemManager = new ItemManager(itemDao)) {
 			itemManager.findByArea("テスト");
 			fail("発生すべき例外 ServiceExceptionが発生しませんでした");
 			
@@ -129,7 +128,7 @@ public class ItemManagerTest {
 		}
 	}
 	private class ItemDaoStub03 extends ItemDao {
-		public ItemDaoStub03() {
+		public ItemDaoStub03() throws DaoException {
 			super(ApplicationProperties.getInstance(Environment.TEST));
 		}
 
