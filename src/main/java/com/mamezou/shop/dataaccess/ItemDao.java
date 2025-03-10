@@ -17,27 +17,44 @@ import com.mamezou.shop.util.ApplicationProperties;
  * 
  * @author ito
  */
-public class ItemDao {
+public class ItemDao implements AutoCloseable {
 	/** {@link #selectByArea(String)} で使用するSQL */
 	private static final String SELECT_BY_AREA_SQL = "SELECT * FROM ITEMS WHERE AREA = ?";
 
-	/** DB接続URL */
-	private String url;
-	/** DB接続ユーザ */
-	private String user;
-	/** DB接続ユーザパスワード */
-	private String password;
+	/** DB接続 */
+	Connection conn;
 
 	/**
 	 * コンストラクタ
-	 * 
-	 * @param properties JDBC接続情報
+	 * @param properties DB接続情報
+	 * @throws DaoException DBに接続できない場合
 	 */
-	public ItemDao(ApplicationProperties properties) {
+	public ItemDao(ApplicationProperties properties) throws DaoException {
+		// DB接続情報取得
+		String url = properties.getDatabaseUrl();
+		String user = properties.getDatabaseUser();
+		String password = properties.getDatabasePassword();
 
-		url = properties.getDatabaseUrl();
-		user = properties.getDatabaseUser();
-		password = properties.getDatabasePassword();
+		// DB接続
+		try {
+			conn = DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {
+			throw new DaoException("DB接続に失敗しました", e);
+		}
+	}
+
+
+	/**
+	 * DB接続をクローズする
+	 * @throws DaoException クローズできない場合
+	 */
+	@Override
+	public void close() throws DaoException {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			throw new DaoException("DB接続の切断に失敗しました", e);
+		}
 	}
 
 	/**
@@ -49,8 +66,7 @@ public class ItemDao {
 	public List<Item> selectByArea(String area) throws DaoException {
 
 		// DB接続
-		try (Connection conn = DriverManager.getConnection(url, user, password);
-			PreparedStatement ps = conn.prepareStatement(SELECT_BY_AREA_SQL)) {			
+		try (PreparedStatement ps = conn.prepareStatement(SELECT_BY_AREA_SQL)) {			
 			// バインド
 			ps.setString(1, area);
 

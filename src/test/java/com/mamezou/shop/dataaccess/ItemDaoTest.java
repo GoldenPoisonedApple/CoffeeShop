@@ -41,7 +41,7 @@ public class ItemDaoTest {
 
 	/** テスト後処理 */
 	@BeforeEach
-	public void setUpEach() {
+	public void setUpEach() throws DaoException {
 		// テスト対象クラス
 		itemDao = new ItemDao(ApplicationProperties.getInstance(Environment.TEST));
 	}
