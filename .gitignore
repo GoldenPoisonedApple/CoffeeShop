@@ -1,0 +1,14 @@
+# Ignore Visual Studio Code
+.vscode/
+
+# logs
+logs/
+
+# build output
+target/
+
+# batch files
+deploy.bat
+
+# properties
+*.properties

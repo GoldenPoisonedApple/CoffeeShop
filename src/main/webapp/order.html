@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>コーヒー豆注文</title>
+  <link rel="stylesheet" href="css/coffeeShop.css">
+</head>
+<body>
+  <h1>コーヒー豆注文</h1>
+	<form action="./order" method="POST">
+    <table class="itemList">
+      <tr>
+        <th></th>
+        <th>商品名</th>
+        <th>原産地域</th>
+        <th>原産地</th>
+        <th>値段</th>
+      </tr>
+      <tr>
+        <td><input type="radio" name="itemId" value="1004" checked /></td>
+        <td>マンデリン</td>
+				<td>アジア</td>
+				<td>スマトラ島</td>
+				<td>500</td>
+      </tr>
+			<tr>
+				<td><input type="radio" name="itemId" value="1005" /></td>
+				<td>ジャワコーヒー</td>
+				<td>アジア</td>
+				<td>ジャワ島</td>
+				<td>450</td>
+			</tr>
+			<tr>
+				<td><input type="radio" name="itemId" value="1006" /></td>
+				<td>ベトナム</td>
+				<td>アジア</td>
+				<td>ベトナム</td>
+				<td>600</td>
+			</tr>
+
+    </table>
+    <table style="margin-top: 1em;">
+      <tr>
+        <th>氏 名</th>
+        <td><input type="text" name="name"></td>
+      </tr>
+      <tr>
+        <th>住 所</th>
+        <td><input type="text" name="address"></td>
+      </tr>
+      <tr>
+        <th>電話番号</th>
+        <td><input type="text" name="telNumber"></td>
+      </tr>
+      <tr>
+        <td colspan="2"><input type="submit" value="注 文" /></td>
+      </tr>
+    </table>
+	</form>
+</body>
+</html>

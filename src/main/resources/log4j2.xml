@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- status: Configuration内でstatusを指定していないレベルのデフォルトを設定
+	(こいつのデフォルトはWARNだから明記しなくてもいい) -->
+<!-- minitorInterval: この設定ファイルを読み込むインターバル(30秒)
+	これにより再起動せずにここの設定を変更可能 デバック向けだが軽い -->
+<Configuration status="WARN" monitorInterval="30">
+
+	<!-- アペンダー(出力場所)の定義 -->
+	<Appenders>
+
+		<!-- コンソールへの出力 -->
+		<!-- SYSTEM_OUT: 標準出力 おそらくコンソール -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<!-- タイムスタンプ [スレッド名] ログレベル ロガー : メッセージ -->
+			<!-- 2025-03-09 12:34:56 [main] INFO  com.example.MyClass : This is a log message -->
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{2} : %msg%n"
+				charset="Shift_JIS" />
+		</Console>
+
+		<!-- rootロガーからきたやつ識別用に作っただけのやつ -->
+		<Console name="ConsoleRoot" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{2} (root): %msg%n"
+				charset="UTF-8" />
+		</Console>
+
+		<!-- ログファイルへの出力 -->
+		<!-- filename: 出力ファイル -->
+		<!-- filePattern: ローテーションファイル(圧縮ファイル)のパターン -->
+		<!-- <RollingFile name="RollingFileLogger" fileName="logs/app.log" -->
+		<RollingFile name="RollingFileLogger" fileName="${sys:catalina.base}/logs/app.log"
+			filePattern="${sys:catalina.base}/logs/app-%d{yyyy-MM-dd}.log.gz">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{2}:%L : %msg%n" />
+
+			<Policies>
+				<!-- 毎日新しいログファイルを作成 -->
+				<TimeBasedTriggeringPolicy />
+				<!-- 10MBを超えたらローテーション（任意設定） -->
+				<SizeBasedTriggeringPolicy size="10MB" />
+			</Policies>
+
+			<!-- 最大7つのローテーションファイルを保持 -->
+			<DefaultRolloverStrategy max="7" />
+		</RollingFile>
+
+	</Appenders>
+
+
+	<!-- ロガーの定義 -->
+	<Loggers>
+		<!-- アプリケーションのロガー -->
+		<!-- アプリはdebugも出力 -->
+		<Logger name="com.mamezou.shop" level="debug" additivity="false">
+			<!-- 開発時のみコンソール出力も -->
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="RollingFileLogger" />
+		</Logger>
+
+		<!-- ルートロガー -->
+		<Root level="info">
+			<AppenderRef ref="ConsoleRoot" />
+			<AppenderRef ref="RollingFileLogger" />
+		</Root>
+	</Loggers>
+
+</Configuration>
