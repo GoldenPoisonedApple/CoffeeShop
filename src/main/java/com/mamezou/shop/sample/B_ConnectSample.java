@@ -7,11 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.mamezou.shop.util.ApplicationProperties;
+import com.mamezou.shop.util.Environment;
 
 public class B_ConnectSample {
 
 	public static void main(String[] args) {
-		ApplicationProperties properties = ApplicationProperties.getInstance();
+		ApplicationProperties properties = ApplicationProperties.getInstance(Environment.PROD);
 		// DB接続用定数
 		String URL = properties.getDatabaseUrl();
 		String USER = properties.getDatabaseUser();

@@ -3,13 +3,22 @@ package com.mamezou.shop.service;
 import com.mamezou.shop.dataaccess.DaoException;
 import com.mamezou.shop.dataaccess.OrderDao;
 import com.mamezou.shop.entity.Order;
-import com.mamezou.shop.util.ApplicationProperties;
 
 /** 
  * 商品情報管理クラス
  * @author ito
  */
 public class OrderManager {
+	/** Daoオブジェクト */
+	private OrderDao orderDao;
+
+	/**
+	 * コンストラクタ
+	 * @param orderDao 注文情報DAO
+	 */
+	public OrderManager(OrderDao orderDao) {
+		this.orderDao = orderDao;
+	}
 	
 	/**
 	 * 注文情報登録
@@ -19,8 +28,6 @@ public class OrderManager {
 	 */
 	public int register(Order order) throws ServiceException {
 
-		// 注文情報DAO生成
-		OrderDao orderDao = new OrderDao(ApplicationProperties.getInstance());
 		try {
 			// 注文情報登録
 			int orderId = orderDao.insert(order);

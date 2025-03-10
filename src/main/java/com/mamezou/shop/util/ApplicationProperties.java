@@ -10,6 +10,11 @@ import org.apache.logging.log4j.Logger;
  * 設定ファイルから、DB接続情報を読み取るシングルトン
  */
 public class ApplicationProperties {
+	/** 本番環境時 読み込みファイル名 */
+	private final String PROD_PROPERTIES = "jdbc.properties";
+	/** テスト時 読み込みファイル名 */
+	private final String TEST_PROPERTIES = "jdbcTest.properties";
+
 	/** ロガー */
 	private static Logger logger = LogManager.getLogger(ApplicationProperties.class);
 
@@ -23,11 +28,12 @@ public class ApplicationProperties {
 	 * インスタンスを取得
 	 * @return インスタンス
 	 */
-	public static ApplicationProperties getInstance() {
+	public static ApplicationProperties getInstance(Environment env) {
 		// synchronizedを使ってスレッドセーフにする
 		synchronized (ApplicationProperties.class) {
 			if (appProps == null) {
-				appProps = new ApplicationProperties();
+				// インスタンス生成
+				appProps = new ApplicationProperties(env);
 			}
 		}
 		return appProps;
@@ -37,7 +43,6 @@ public class ApplicationProperties {
 	 * コンストラクタ.
 	 *
 	 * 本アプリケーションの設定ファイル(application.properties)から設定値を読み込みます．
-	 * ファイル読み込みに失敗した場合、本クラスで定義されたデフォルト値が用いられます．
 	 *
 	 * 利用可能な設定項目(キー名)は以下の通り：
 	 * <pre>
@@ -48,13 +53,22 @@ public class ApplicationProperties {
 	 * # DBのパスワード
 	 * db.password
 	 * </pre>
-	 * 
+	 * @param env 実行環境
 	 * @throws RuntimeException 設定ファイル application.properties の読み込みに失敗した場合
 	 */
-	private ApplicationProperties() {
+	private ApplicationProperties(Environment env) {
+		// 環境に応じたプロパティファイル名を設定
+		String propertiesFileName;
+		switch (env) {
+			case PROD: propertiesFileName = PROD_PROPERTIES; break;
+			case TEST: propertiesFileName = TEST_PROPERTIES; break;
+			default: propertiesFileName = TEST_PROPERTIES; break;
+		}
+
+		// プロパティファイルの読み込み
 		props = new Properties();
 		try {
-			props.load(getClass().getClassLoader().getResourceAsStream("jdbc.properties"));
+			props.load(getClass().getClassLoader().getResourceAsStream(propertiesFileName));
 
 		} catch (IOException e) {
 			throw new RuntimeException("DB設定ファイルの読み込みに失敗しました", e);
