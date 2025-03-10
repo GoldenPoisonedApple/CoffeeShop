@@ -50,6 +50,13 @@
 			<version>8.0.33</version>
 		</dependency>
 
+		<!-- テストのScriptRunner用 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.5.9</version>
+		</dependency>
+
 		<!-- JUnit5 -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

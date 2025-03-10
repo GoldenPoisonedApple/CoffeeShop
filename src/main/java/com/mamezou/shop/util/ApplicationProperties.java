@@ -43,7 +43,6 @@ public class ApplicationProperties {
 	 * コンストラクタ.
 	 *
 	 * 本アプリケーションの設定ファイル(application.properties)から設定値を読み込みます．
-	 * ファイル読み込みに失敗した場合、本クラスで定義されたデフォルト値が用いられます．
 	 *
 	 * 利用可能な設定項目(キー名)は以下の通り：
 	 * <pre>
