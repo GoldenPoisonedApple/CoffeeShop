@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS ITEMS (
 ) COMMENT='商品';
 
 -- 全件削除
-TRUNCATE TABLE ITEM;
+SET foreign_key_checks = 0;	-- 外部キー制約を無効にする
+TRUNCATE TABLE ITEMS;
+SET foreign_key_checks = 1;	-- 外部キー制約を有効にする
 
 -- AUTO_INCREMENT の開始値を設定
 ALTER TABLE ITEMS AUTO_INCREMENT = 1001;

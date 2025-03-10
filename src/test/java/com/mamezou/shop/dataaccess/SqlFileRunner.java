@@ -32,7 +32,11 @@ public class SqlFileRunner {
 		String  user = properties.getDatabaseUser();
 		String password = properties.getDatabasePassword();
 		// DB接続
-		connection = DriverManager.getConnection(url, user, password);
+		try {
+			connection = DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {
+			throw new SQLException("DB接続に失敗しました", e);
+		}
 	}
 
 	/**
