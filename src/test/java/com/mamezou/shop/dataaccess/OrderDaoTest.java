@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.*;
 
+import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.util.ApplicationProperties;
 import com.mamezou.shop.util.Environment;
@@ -53,6 +54,12 @@ public class OrderDaoTest {
 		// テスト対象クラス
 		orderDao = new OrderDao(ApplicationProperties.getInstance(Environment.TEST));
 	}
+	/** テスト後処理 */
+	@AfterEach
+	public void tearDownEach() throws DaoException {
+		// リソース解放
+		orderDao.close();
+	}
 
 	// ------------------------------
 	// registerメソッドのテスト
@@ -70,7 +77,7 @@ public class OrderDaoTest {
 	@Test
 	public void testRegister_01() throws Exception {
 		// 事前条件 テーブル初期化
-		sqlFileRunner.runSqlScript("orders_0data.sql");
+		sqlFileRunner.runSqlScript("Orders_0data.sql");
 
 		// テスト対象メソッドを実行
 		Order expected = new Order("氏名1", "住所1", "電話番号1", 1001);
@@ -129,5 +136,74 @@ public class OrderDaoTest {
 		assertTrue(exception.getMessage().contains("データベース関連エラー"));
 	}
 
+	// ------------------------------
+	// selectAllメソッドのテスト
+	// 全ての商品情報を取得する
+	// ------------------------------
+	/**
+	 * 正常系
+	 * 商品情報が1件もない場合
+	 */
+	@Test
+	public void testSelectAll_02() throws SQLException, DaoException {
+		// テストデータ投入
+		sqlFileRunner.runSqlScript("Orders_0data.sql");
 
+		// テスト対象メソッドを実行
+		List<Order> actual = orderDao.selectAll();
+
+		// 結果検証
+		assertEquals(0, actual.size());
+	}
+
+	/**
+	 * 正常系
+	 * 商品情報が1件以上ある場合(3件)
+	 */
+	@Test
+	public void testSelectAll_01() throws SQLException, DaoException {
+		// テストデータ投入
+		sqlFileRunner.runSqlScript("Orders_3data.sql");
+
+		// テスト対象メソッドを実行
+		List<Order> actual = orderDao.selectAll();
+
+		// 期待値作成
+		List<Order> expected = Arrays.asList(
+			new Order(2001, "氏名1", "住所1", "電話1", 1001),
+			new Order(2002, "氏名2", "住所2", "電話2", 1002),
+			new Order(2003, "氏名3", "住所3", "電話3", 1001)
+		);
+
+		// 結果検証
+		assertEquals(expected, actual);
+	}
+
+	/**
+	 * 異常系
+	 * java.sql.SQLExceptionが発生した場合
+	 */
+	@Test
+	public void testSelectAll_03() throws Exception {
+		// スタブの作成
+		Connection conn = mock(Connection.class);
+		// スタブの動作を定義
+		try {
+			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
+		} catch (SQLException e) {
+			fail(e);
+		}
+
+		// テスト対象クラスにスタブを注入
+		// private変数のフィールドを取得
+		Field field = orderDao.getClass().getDeclaredField("conn");
+		// private変数へのアクセス制限を解除
+		field.setAccessible(true);
+		// private変数に値を設定
+		field.set(orderDao, conn);
+
+		// テスト対象メソッドを実行
+		Exception exception = assertThrows(DaoException.class, () -> orderDao.selectAll());
+		assertTrue(exception.getMessage().contains("データベース関連エラー"));
+	}
 }
