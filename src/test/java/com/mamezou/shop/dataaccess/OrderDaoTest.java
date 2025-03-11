@@ -1,5 +1,7 @@
 package com.mamezou.shop.dataaccess;
 
+import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.*;
 
@@ -100,22 +106,28 @@ public class OrderDaoTest {
 	 */
 	@Test
 	public void testRegister_02() throws Exception {
-		// できない
+		// スタブの作成
+		Connection conn = mock(Connection.class);
+		// スタブの動作を定義
+		try {
+			when(conn.prepareStatement(any(), anyInt())).thenThrow(new SQLException("テスト用例外"));
+		} catch (SQLException e) {
+			fail(e);
+		}
 
+		// テスト対象クラスにスタブを注入
+		// private変数のフィールドを取得
+		Field field = orderDao.getClass().getDeclaredField("conn");
+		// private変数へのアクセス制限を解除
+		field.setAccessible(true);
+		// private変数に値を設定
+		field.set(orderDao, conn);
 
-		// // 事前条件 なし
-
-		// // テスト用注文情報
-		// Order order = new Order("氏名1", "住所1", "電話番号1", 1001);
-		// // モック作成
-		// // Act: DriverManager.getConnection() を呼び出す際にSQLExceptionをスローするように静的モックを設定
-		// try (MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
-		// 	mockedDriverManager.when(() -> DriverManager.getConnection(anyString(), anyString(), anyString()))
-		// 			.thenThrow(new SQLException("Connection failure"));
-
-		// 	// 検証
-		// 	Exception exception = assertThrows(DaoException.class, () -> orderDao.insert(order));
-		// 	assertTrue(exception.getMessage().contains("データベース関連エラー"));
-		// }
+		// テスト対象メソッドを実行
+		Order test = new Order("氏名1", "住所1", "電話番号1", 1001);
+		Exception exception = assertThrows(DaoException.class, () -> orderDao.insert(test));
+		assertTrue(exception.getMessage().contains("データベース関連エラー"));
 	}
+
+
 }
