@@ -20,7 +20,7 @@ public class ChangeLanguageServlet extends HttpServlet {
 		// リクエスト元URL取得
 		String referer = request.getHeader("Referer");
 		if (referer == null) {
-			referer = "index.html";
+			referer = "index.jsp";
 		}
 		// デバッグ用
 		Logger logger = LogManager.getLogger(ChangeLanguageServlet.class.getName());

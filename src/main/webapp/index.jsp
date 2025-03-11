@@ -13,10 +13,6 @@
   <link rel="stylesheet" href="css/coffeeShop.css">
 </head>
 <body>
-	<h1>
-		<fmt:message key="welcome.message" />
-	</h1>
-
   <p>
     <fmt:message key="index.description" />
   </p>
