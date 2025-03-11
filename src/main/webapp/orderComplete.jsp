@@ -13,6 +13,6 @@
 	<p>注文ID : ${orderId}</p>
 
 	<br>
-	<p><a href="./index.html">トップへ戻る</a></p>
+	<p><a href="./index.jsp">トップへ戻る</a></p>
 </body>
 </html>
