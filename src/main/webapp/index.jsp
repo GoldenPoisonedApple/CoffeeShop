@@ -27,6 +27,9 @@
 	<ul>
 		<li><a href="change-language?lang=en"><fmt:message key="index.language.english" /></a></li>
 		<li><a href="change-language?lang=ja"><fmt:message key="index.language.japanese" /></a></li>
+		<li><a href="change-language?lang=zh-CN"><fmt:message key="index.language.chinese" /></a></li>
+		<li><a href="change-language?lang=ar"><fmt:message key="index.language.arabic" /></a></li>
+
 	</ul>
 </body>
 </html>
