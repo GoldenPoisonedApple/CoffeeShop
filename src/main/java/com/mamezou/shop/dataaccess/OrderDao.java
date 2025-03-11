@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.util.ApplicationProperties;
@@ -19,6 +21,8 @@ import com.mamezou.shop.util.ApplicationProperties;
 public class OrderDao {
 	/** {@link #insert(Order order)} で使用するSQL */
 	private static final String INSERT_SQL = "INSERT INTO ORDERS (NAME, ADDRESS, TEL_NUMBER, ITEM_ID) VALUES (?, ?, ?, ?)";
+	/** {@link #selectAll()} で使用するSQL */
+	private static final String SELECT_ALL_SQL = "SELECT * FROM ORDERS";
 
 	/** DB接続URL */
 	private String url;
@@ -73,6 +77,35 @@ public class OrderDao {
 		} catch (SQLException e) {
 			throw new DaoException("データベース関連エラー", e);
 
+		}
+	}
+
+	/**
+	 * 全ての注文情報を取得する
+	 * @return 注文情報リスト
+	 * @throws DaoException SQLExeptionが発生した場合
+	 */
+	public List<Order> selectAll() throws DaoException {
+		// DB接続
+		try (Connection conn = DriverManager.getConnection(url, user, password);
+				PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
+				ResultSet rs = ps.executeQuery()) {
+
+			// 結果取得
+			List<Order> orders = new ArrayList<>();
+			while (rs.next()) {
+				Order order = new Order(
+						rs.getInt("ID"),
+						rs.getString("NAME"),
+						rs.getString("ADDRESS"),
+						rs.getString("TEL_NUMBER"),
+						rs.getInt("ITEM_ID"));
+				orders.add(order);
+			}
+			return orders;
+
+		} catch (SQLException e) {
+			throw new DaoException("データベース関連エラー", e);
 		}
 	}
 }

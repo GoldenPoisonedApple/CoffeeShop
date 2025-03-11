@@ -1,5 +1,7 @@
 package com.mamezou.shop.service;
 
+import java.util.List;
+
 import com.mamezou.shop.dataaccess.DaoException;
 import com.mamezou.shop.dataaccess.OrderDao;
 import com.mamezou.shop.entity.Order;
@@ -38,5 +40,21 @@ public class OrderManager {
 			throw new ServiceException("サービス関連エラー", e);
 		}
 		
+	}
+
+	/**
+	 * 注文情報取得
+	 * @return 注文情報リスト
+	 * @throws ServiceException DaoExceptionが発生した場合
+	 */
+	public List<Order> getAll() throws ServiceException {
+		try {
+			// 注文情報取得 返す
+			List<Order> orders = orderDao.selectAll();
+			return orders;
+
+		} catch (DaoException e) {
+			throw new ServiceException("サービス関連エラー", e);
+		}
 	}
 }
