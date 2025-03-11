@@ -23,6 +23,7 @@
 		<li><fmt:message key="index.task3" />&nbsp;<a href="./showAllTable"><fmt:message key="index.task3.name" /></a></li>
   </ul>
 	<p><fmt:message key="index.language.change" />:	${sessionScope.language}</p>
+	<p><fmt:message key="index.language.reason" /></p>
 	<ul>
 		<li><a href="change-language?lang=en"><fmt:message key="index.language.english" /></a></li>
 		<li><a href="change-language?lang=ja"><fmt:message key="index.language.japanese" /></a></li>
