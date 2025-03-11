@@ -8,14 +8,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.mamezou.shop.dataaccess.DaoException;
-import com.mamezou.shop.dataaccess.ItemDao;
-import com.mamezou.shop.dataaccess.OrderDao;
 import com.mamezou.shop.service.ItemManager;
 import com.mamezou.shop.service.OrderManager;
 import com.mamezou.shop.service.ServiceException;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
 
 /**
  * 商品情報検索サーブレット
@@ -28,16 +23,13 @@ public class ShowAllTableServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// テーブルの全データ取得
-		try (ItemManager itemManager = new ItemManager(new ItemDao(ApplicationProperties.getInstance(Environment.PROD)));
-			OrderManager orderManager = new OrderManager(new OrderDao(ApplicationProperties.getInstance(Environment.PROD)))
-			) {
-			
+		try {
 			// 商品情報取得
-			request.setAttribute("items", itemManager.getAll());
+			request.setAttribute("items", new ItemManager().getAll());
 			// 注文情報取得
-			request.setAttribute("orders", orderManager.getAll());
+			request.setAttribute("orders", new OrderManager().getAll());
 			
-		} catch (ServiceException | DaoException e) {
+		} catch (ServiceException e) {
 			// リクエストパラメータにエラー情報格納
 			request.setAttribute("exception", e);
 			// エラーページにフォワード

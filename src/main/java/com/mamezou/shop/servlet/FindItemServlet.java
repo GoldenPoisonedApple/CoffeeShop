@@ -8,12 +8,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.mamezou.shop.dataaccess.DaoException;
-import com.mamezou.shop.dataaccess.ItemDao;
 import com.mamezou.shop.service.ItemManager;
 import com.mamezou.shop.service.ServiceException;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
 
 /**
  * 商品情報検索サーブレット
@@ -30,13 +26,13 @@ public class FindItemServlet extends HttpServlet {
 		String area = request.getParameter("area");
 
 		// 商品情報取得
-		try (ItemManager itemManager = new ItemManager(new ItemDao(ApplicationProperties.getInstance(Environment.PROD)))) {
+		try {
 			// リクエストパラメータに条件に合う商品情報格納
-			request.setAttribute("itemList", itemManager.findByArea(area));
+			request.setAttribute("itemList", new ItemManager().findByArea(area));
 			// 商品情報表示ページにフォワード
 			request.getRequestDispatcher("itemList.jsp").forward(request, response);
 
-		} catch (ServiceException | DaoException e) {
+		} catch (ServiceException e) {
 			// リクエストパラメータにエラー情報格納
 			request.setAttribute("exception", e);
 			// エラーページにフォワード

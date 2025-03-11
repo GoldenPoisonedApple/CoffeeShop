@@ -1,20 +1,14 @@
 package com.mamezou.shop.dataaccess;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.*;
-
 import com.mamezou.shop.entity.Item;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
 
 /**
  * {@link com.mamezou.shop.dataaccess.ItemDao}のテストクラス
@@ -29,31 +23,27 @@ public class ItemDaoTest {
 
 	/** 事前処理 */
 	@BeforeAll
-	public static void setUp() throws SQLException {
+	public static void setUp() {
 		// SQLファイルから実行
-		sqlFileRunner = new SqlFileRunner(ApplicationProperties.getInstance(Environment.TEST));
+		sqlFileRunner = new SqlFileRunner();
 	}
-
 	/** 事後処理 */
 	@AfterAll
 	public static void tearDown() throws SQLException {
 		// データベース初期化
 		sqlFileRunner.runSqlScript("InitAll.sql");
-		// リソース解放
-		sqlFileRunner.close();
 	}
 
 	/** テスト前処理 */
 	@BeforeEach
-	public void setUpEach() throws DaoException {
+	public void setUpEach() {
 		// テスト対象クラス
-		itemDao = new ItemDao(ApplicationProperties.getInstance(Environment.TEST));
+		itemDao = new ItemDao();
 	}
 	/** テスト後処理 */
 	@AfterEach
-	public void tearDownEach() throws DaoException {
-		// リソース解放
-		itemDao.close();
+	public void tearDownEach() {
+
 	}
 
 
@@ -101,26 +91,17 @@ public class ItemDaoTest {
 
 	/**
 	 * 異常系
+	 * データベース接続ができない場合
 	 * java.sql.SQLExceptionが発生した場合
 	 */
 	@Test
 	public void testSelectByArea_03() throws Exception {
-		// スタブの作成
-		Connection conn = mock(Connection.class);
-		// スタブの動作を定義
-		try {
-			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
-		} catch (SQLException e) {
-			fail(e);
-		}
-
-		// テスト対象クラスにスタブを注入
+		// 偽のURLを設定
+		String url = "not connect url";
 		// private変数のフィールドを取得
-		Field field = itemDao.getClass().getDeclaredField("conn");
-		// private変数へのアクセス制限を解除
-		field.setAccessible(true);
-		// private変数に値を設定
-		field.set(itemDao, conn);
+		Field field = itemDao.getClass().getDeclaredField("url");
+		field.setAccessible(true); // アクセス制限を解除
+		field.set(itemDao, url);	// 値を設定
 
 		// テスト対象メソッドを実行
 		Exception exception = assertThrows(DaoException.class, () -> itemDao.selectByArea("原産地1"));
@@ -137,7 +118,7 @@ public class ItemDaoTest {
 	 * 商品情報が1件もない場合
 	 */
 	@Test
-	public void testSelectAll_02() throws SQLException, DaoException {
+	public void testSelectAll_01() throws SQLException, DaoException {
 		// テストデータ投入
 		sqlFileRunner.runSqlScript("Items_0data.sql");
 
@@ -153,7 +134,7 @@ public class ItemDaoTest {
 	 * 商品情報が1件以上ある場合(3件)
 	 */
 	@Test
-	public void testSelectAll_01() throws SQLException, DaoException {
+	public void testSelectAll_02() throws SQLException, DaoException {
 		// テストデータ投入
 		sqlFileRunner.runSqlScript("Items_3data.sql");
 
@@ -173,26 +154,17 @@ public class ItemDaoTest {
 
 	/**
 	 * 異常系
+	 * データベース接続ができない場合
 	 * java.sql.SQLExceptionが発生した場合
 	 */
 	@Test
 	public void testSelectAll_03() throws Exception {
-		// スタブの作成
-		Connection conn = mock(Connection.class);
-		// スタブの動作を定義
-		try {
-			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
-		} catch (SQLException e) {
-			fail(e);
-		}
-
-		// テスト対象クラスにスタブを注入
+		// 偽のURLを設定
+		String url = "not connect url";
 		// private変数のフィールドを取得
-		Field field = itemDao.getClass().getDeclaredField("conn");
-		// private変数へのアクセス制限を解除
-		field.setAccessible(true);
-		// private変数に値を設定
-		field.set(itemDao, conn);
+		Field field = itemDao.getClass().getDeclaredField("url");
+		field.setAccessible(true); // アクセス制限を解除
+		field.set(itemDao, url);	// 値を設定
 
 		// テスト対象メソッドを実行
 		Exception exception = assertThrows(DaoException.class, () -> itemDao.selectAll());

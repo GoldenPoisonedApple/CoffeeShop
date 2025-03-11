@@ -11,29 +11,15 @@ import com.mamezou.shop.entity.Item;
  * 
  * @author ito
  */
-public class ItemManager implements AutoCloseable {
+public class ItemManager {
 	/** Daoオブジェクト */
 	private ItemDao itemDao;
 
 	/**
 	 * コンストラクタ
-	 * 
-	 * @param itemDao Daoオブジェクト
 	 */
-	public ItemManager(ItemDao itemDao) {
-		this.itemDao = itemDao;
-	}
-
-	@Override
-	public void close() throws ServiceException {
-		if (itemDao != null) {
-			try {
-				itemDao.close();
-				
-			} catch (DaoException e) {
-				throw new ServiceException("リソースの開放に失敗しました", e);
-			}
-		}
+	public ItemManager() {
+		itemDao = new ItemDao();
 	}
 
 	/**

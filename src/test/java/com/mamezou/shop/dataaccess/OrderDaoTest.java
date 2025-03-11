@@ -1,7 +1,6 @@
 package com.mamezou.shop.dataaccess;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,16 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.*;
-
 import com.mamezou.shop.entity.Order;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
+
 
 /**
  * {@link com.mamezou.shop.dataaccess.OrderDao}のテストクラス
@@ -33,9 +26,9 @@ public class OrderDaoTest {
 
 	/** 事前処理 */
 	@BeforeAll
-	public static void setUp() throws SQLException {
+	public static void setUp() {
 		// SQLファイルから実行
-		sqlFileRunner = new SqlFileRunner(ApplicationProperties.getInstance(Environment.TEST));
+		sqlFileRunner = new SqlFileRunner();
 	}
 
 	/** 事後処理 */
@@ -43,21 +36,18 @@ public class OrderDaoTest {
 	public static void tearDown() throws SQLException {
 		// データベース初期化
 		sqlFileRunner.runSqlScript("InitAll.sql");
-		// リソース解放
-		sqlFileRunner.close();
 	}
 
 	/** テスト前処理 */
 	@BeforeEach
-	public void setUpEach() throws DaoException {
+	public void setUpEach() {
 		// テスト対象クラス
-		orderDao = new OrderDao(ApplicationProperties.getInstance(Environment.TEST));
+		orderDao = new OrderDao();
 	}
 	/** テスト後処理 */
 	@AfterEach
-	public void tearDownEach() throws DaoException {
-		// リソース解放
-		orderDao.close();
+	public void tearDownEach() {
+		
 	}
 
 	// ------------------------------
@@ -74,7 +64,7 @@ public class OrderDaoTest {
 	 * 登録した注文情報がDBに登録されていること
 	 */
 	@Test
-	public void testRegister_01() throws Exception {
+	public void testRegister_01() throws SQLException, DaoException {
 		// 事前条件 テーブル初期化
 		sqlFileRunner.runSqlScript("Orders_0data.sql");
 
@@ -112,26 +102,16 @@ public class OrderDaoTest {
 	 */
 	@Test
 	public void testRegister_02() throws Exception {
-		// スタブの作成
-		Connection conn = mock(Connection.class);
-		// スタブの動作を定義
-		try {
-			when(conn.prepareStatement(any(), anyInt())).thenThrow(new SQLException("テスト用例外"));
-		} catch (SQLException e) {
-			fail(e);
-		}
-
-		// テスト対象クラスにスタブを注入
+		// 偽のURLを設定
+		String url = "not connect url";
 		// private変数のフィールドを取得
-		Field field = orderDao.getClass().getDeclaredField("conn");
-		// private変数へのアクセス制限を解除
-		field.setAccessible(true);
-		// private変数に値を設定
-		field.set(orderDao, conn);
+		Field field = orderDao.getClass().getDeclaredField("url");
+		field.setAccessible(true); // アクセス制限を解除
+		field.set(orderDao, url);	// 値を設定
 
 		// テスト対象メソッドを実行
-		Order test = new Order("氏名1", "住所1", "電話番号1", 1001);
-		Exception exception = assertThrows(DaoException.class, () -> orderDao.insert(test));
+		Order order = new Order("氏名1", "住所1", "電話番号1", 1001);
+		Exception exception = assertThrows(DaoException.class, () -> orderDao.insert(order));
 		assertTrue(exception.getMessage().contains("データベース関連エラー"));
 	}
 
@@ -184,22 +164,12 @@ public class OrderDaoTest {
 	 */
 	@Test
 	public void testSelectAll_03() throws Exception {
-		// スタブの作成
-		Connection conn = mock(Connection.class);
-		// スタブの動作を定義
-		try {
-			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
-		} catch (SQLException e) {
-			fail(e);
-		}
-
-		// テスト対象クラスにスタブを注入
+		// 偽のURLを設定
+		String url = "not connect url";
 		// private変数のフィールドを取得
-		Field field = orderDao.getClass().getDeclaredField("conn");
-		// private変数へのアクセス制限を解除
-		field.setAccessible(true);
-		// private変数に値を設定
-		field.set(orderDao, conn);
+		Field field = orderDao.getClass().getDeclaredField("url");
+		field.setAccessible(true); // アクセス制限を解除
+		field.set(orderDao, url);	// 値を設定
 
 		// テスト対象メソッドを実行
 		Exception exception = assertThrows(DaoException.class, () -> orderDao.selectAll());

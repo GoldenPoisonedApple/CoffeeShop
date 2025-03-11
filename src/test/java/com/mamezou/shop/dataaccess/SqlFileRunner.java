@@ -14,29 +14,27 @@ import com.mamezou.shop.util.ApplicationProperties;
 
 /**
  * SQLファイルを実行するクラス
- * 必ずclose()を呼び出してリソースを解放すること
  * テスト用
  */
 public class SqlFileRunner {
-	/** DB接続 */
-	private Connection connection;
+	/** DB接続URL */
+	private String url;
+	/** DB接続ユーザ */
+	private String user;
+	/** DB接続パスワード */
+	private String password;
 
 	/**
 	 * コンストラクタ
 	 * 
 	 * @param properties DB接続情報
 	 */
-	public SqlFileRunner(ApplicationProperties properties) throws SQLException {
+	public SqlFileRunner() {
 		// DB接続情報取得
-		String url = properties.getDatabaseUrl();
-		String  user = properties.getDatabaseUser();
-		String password = properties.getDatabasePassword();
-		// DB接続
-		try {
-			connection = DriverManager.getConnection(url, user, password);
-		} catch (SQLException e) {
-			throw new SQLException("DB接続に失敗しました", e);
-		}
+		ApplicationProperties properties = ApplicationProperties.getInstance();
+		url = properties.getDatabaseUrl();
+		user = properties.getDatabaseUser();
+		password = properties.getDatabasePassword();
 	}
 
 	/**
@@ -44,16 +42,20 @@ public class SqlFileRunner {
 	 * リソースファイルはCLASSPATHに含まれていること.
 	 * 
 	 * @param resourceName 実行するSQLスクリプトのリソース名
-	 * @throws IOException リソースが見つからない場合
+	 * @throws SQLException リソースが見つからない場合
 	 */
 	public void runSqlScript(String resourceName) throws SQLException {
-		// ScriptRunnerを使用してSQLファイルを実行
-		ScriptRunner scriptRunner = new ScriptRunner(connection);
-		InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceName);
-		if (inputStream == null) {
-			throw new SQLException("リソースが見つかりません:" + resourceName);
+		// DB接続
+		try (Connection conn = DriverManager.getConnection(url, user, password)) {
+
+			// ScriptRunnerを使用してSQLファイルを実行
+			ScriptRunner scriptRunner = new ScriptRunner(conn);
+			InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceName);
+			if (inputStream == null) {
+				throw new SQLException("リソースが見つかりません:" + resourceName);
+			}
+			scriptRunner.runScript(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 		}
-		scriptRunner.runScript(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -63,21 +65,10 @@ public class SqlFileRunner {
 	 * @return テーブルのデータ
 	 * @throws SQLException SQL例外が発生した場合
 	 */
-	public ResultSet getTableData (String tableName) throws SQLException {
-		return connection.createStatement().executeQuery("SELECT * FROM " + tableName);
-	}
-
-	/**
-	 * リソースを解放する.
-	 * 必ず呼び出すこと.
-	 */
-	public void close() {
-		if (connection != null) {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+	public ResultSet getTableData(String tableName) throws SQLException {
+		// DB接続
+		try (Connection conn = DriverManager.getConnection(url, user, password)) {
+			return conn.createStatement().executeQuery("SELECT * FROM " + tableName);
 		}
 	}
 
