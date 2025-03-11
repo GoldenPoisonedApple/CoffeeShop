@@ -8,13 +8,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.mamezou.shop.dataaccess.DaoException;
-import com.mamezou.shop.dataaccess.OrderDao;
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.service.OrderManager;
 import com.mamezou.shop.service.ServiceException;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
 
 /**
  * 商品情報検索サーブレット
@@ -38,11 +34,10 @@ public class OrderServlet extends HttpServlet {
 
 		// 注文情報登録
 		int orderId = -1;
-		try (OrderManager orderManager = new OrderManager(new OrderDao(ApplicationProperties.getInstance(Environment.PROD)));
-		) {
-			orderId = orderManager.register(order);
+		try {
+			orderId = new OrderManager().register(order);
 
-		} catch (ServiceException | DaoException e) {
+		} catch (ServiceException e) {
 			// リクエストパラメータにエラー情報格納
 			request.setAttribute("exception", e);
 			// エラーページにフォワード

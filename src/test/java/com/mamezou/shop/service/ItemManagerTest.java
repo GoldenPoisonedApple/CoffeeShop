@@ -1,21 +1,18 @@
 package com.mamezou.shop.service;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.*;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.*;
 
 import com.mamezou.shop.dataaccess.DaoException;
 import com.mamezou.shop.dataaccess.ItemDao;
 import com.mamezou.shop.entity.Item;
-import com.mamezou.shop.util.ApplicationProperties;
-import com.mamezou.shop.util.Environment;
-import static org.mockito.Mockito.*;
 
 /**
  * {@link com.mamezou.shop.service.ItemManager} のテストクラス
@@ -24,17 +21,27 @@ import static org.mockito.Mockito.*;
  * @author ito
  */
 public class ItemManagerTest {
+	/** テスト対象クラス */
+	private ItemManager itemManager;
+	/** モック */
+	private ItemDao itemDao;
 
 	/** テスト前処理 */
 	@BeforeEach
-	void setUp() {
-		// コンストラクタでDaoオブジェクトを渡すためない
+	void setUp() throws Exception {
+		// モックを作成
+		itemDao = mock(ItemDao.class);
+		// テスト対象クラス作成
+		itemManager = new ItemManager();
+		// モックを挿入
+		Field field = itemManager.getClass().getDeclaredField("itemDao");
+		field.setAccessible(true); // アクセス制限を解除
+		field.set(itemManager, itemDao);	// 値を設定
 	}
 
 	/** テスト後処理 */
 	@AfterEach
 	void tearDown() {
-		// ない
 	}
 
 	// ------------------------------
@@ -46,33 +53,17 @@ public class ItemManagerTest {
 	 * 検索結果が0件の場合
 	 */
 	@Test
-	public void testFindByArea_01() throws DaoException {
-		// スタブを作成
-		ItemDao itemDao = new ItemDaoStub01();
+	public void testFindByArea_01() throws ServiceException, DaoException {
+		String findArea = "テスト";
+
+		// スタブとしてのモックの動作を定義
+		when(itemDao.selectByArea(findArea)).thenReturn(new ArrayList<>());
 
 		// テスト対象メソッドを実行
-		try (ItemManager itemManager = new ItemManager(itemDao)) {
+		List<Item> actual = itemManager.findByArea(findArea);
 
-			List<Item> actual = itemManager.findByArea("テスト");
-
-			// 結果検証
-			assertEquals(0, actual.size());
-
-		} catch (ServiceException e) {
-			Assertions.fail(e);
-		}
-
-	}
-
-	private class ItemDaoStub01 extends ItemDao {
-		public ItemDaoStub01() throws DaoException {
-			super(ApplicationProperties.getInstance(Environment.TEST));
-		}
-
-		@Override
-		public List<Item> selectByArea(String area) {
-			return new ArrayList<>();
-		}
+		// 結果検証
+		assertEquals(0, actual.size());
 	}
 
 	/**
@@ -80,41 +71,28 @@ public class ItemManagerTest {
 	 * 検索結果が1件以上の場合
 	 */
 	@Test
-	public void testFindByArea_02() throws DaoException {
-		// スタブを作成
-		ItemDao itemDao = new ItemDaoStub02();
+	public void testFindByArea_02() throws ServiceException, DaoException {
+		String findArea = "原産1";
+
+		// スタブとしてのモックの動作を定義
+		List<Item> items = new ArrayList<>();
+		items.add(new Item(1, "商品1", "原産1", "原産地1", 500));
+		items.add(new Item(2, "商品2", "原産1", "原産地2", 600));
+		when(itemDao.selectByArea(findArea)).thenReturn(items);
 
 		// テスト対象メソッドを実行
-		try (ItemManager itemManager = new ItemManager(itemDao)) {
+		List<Item> actual = itemManager.findByArea(findArea);
 
-			List<Item> actual = itemManager.findByArea("テスト");
+		// 結果検証
+		assertEquals(2, actual.size());
 
-			// 期待値作成
-			List<Item> expected = Arrays.asList(
-					new Item(1, "商品1", "原産1", "原産地1", 500),
-					new Item(2, "商品2", "原産2", "原産地2", 600));
+		// 期待値作成
+		List<Item> expected = Arrays.asList(
+				new Item(1, "商品1", "原産1", "原産地1", 500),
+				new Item(2, "商品2", "原産1", "原産地2", 600));
 
-			// 結果検証
-			assertEquals(expected, actual);
-
-		} catch (ServiceException e) {
-			Assertions.fail(e);
-		}
-
-	}
-
-	private class ItemDaoStub02 extends ItemDao {
-		public ItemDaoStub02() throws DaoException {
-			super(ApplicationProperties.getInstance(Environment.TEST));
-		}
-
-		@Override
-		public List<Item> selectByArea(String area) {
-			List<Item> items = new ArrayList<>();
-			items.add(new Item(1, "商品1", "原産1", "原産地1", 500));
-			items.add(new Item(2, "商品2", "原産2", "原産地2", 600));
-			return items;
-		}
+		// 結果検証
+		assertEquals(expected, actual);
 	}
 
 	/**
@@ -122,79 +100,16 @@ public class ItemManagerTest {
 	 * DaoExceptionが発生した場合
 	 */
 	@Test
-	public void testFindByArea_03() throws DaoException {
-		// スタブを作成
-		ItemDao itemDao = new ItemDaoStub03();
+	public void testFindByArea_03() throws ServiceException, DaoException {
+		String findArea = "テスト";
+
+		// スタブとしてのモックの動作を定義
+		when(itemDao.selectByArea(findArea)).thenThrow(new DaoException("データベース関連エラー", new Exception()));
 
 		// テスト対象メソッドを実行
-		try (ItemManager itemManager = new ItemManager(itemDao)) {
-			itemManager.findByArea("テスト");
-			fail("発生すべき例外 ServiceExceptionが発生しませんでした");
+		Exception exception = assertThrows(ServiceException.class, () -> itemManager.findByArea(findArea));
 
-		} catch (ServiceException e) {
-			// 例外発生時の挙動を検証
-			assertEquals("サービス関連エラー", e.getMessage());
-		}
-	}
-
-	private class ItemDaoStub03 extends ItemDao {
-		public ItemDaoStub03() throws DaoException {
-			super(ApplicationProperties.getInstance(Environment.TEST));
-		}
-
-		@Override
-		public List<Item> selectByArea(String area) throws DaoException {
-			throw new DaoException("サービス関連エラー", new Throwable());
-		}
-	}
-
-	// ------------------------------
-	// closeメソッドのテスト
-	// リソースの開放
-	// ------------------------------
-	/**
-	 * 正常系
-	 * リソースの開放成功の場合
-	 */
-	@Test
-	public void testClose_01() throws DaoException {
-		// モックを作成
-		ItemDao itemDao = mock(ItemDao.class);
-
-		// テスト対象メソッドを実行
-		try (ItemManager itemManager = new ItemManager(itemDao)) {
-			// 何もしない
-		} catch (ServiceException e) {
-			Assertions.fail(e);
-		}
-
-		// closeメソッドが呼び出されたか検証
-		verify(itemDao, times(1)).close();
-	}
-
-	/**
-	 * 異常系
-	 * DaoExceptionが発生した場合
-	 */
-	@Test
-	public void testClose_02() throws DaoException {
-		// スタブを作成
-		ItemDao itemDao = mock(ItemDao.class);
-		doThrow(new DaoException("DB接続の切断に失敗しました", new Exception())).when(itemDao).close();
-
-		// テスト対象メソッドを実行
-		try (ItemManager itemManager = new ItemManager(itemDao)) {
-			// 何もしない
-
-		} catch (ServiceException e) {
-			// 例外発生時の挙動を検証
-			assertEquals("リソースの開放に失敗しました", e.getMessage());
-			// closeメソッドが呼び出されたか検証
-			verify(itemDao, times(1)).close();
-
-			return; // 例外が発生した時はここでテスト終了
-		}
-
-		fail("発生すべき例外 ServiceExceptionが発生しませんでした");
+		// 例外発生時の挙動を検証
+		assertEquals("サービス関連エラー", exception.getMessage());
 	}
 }
