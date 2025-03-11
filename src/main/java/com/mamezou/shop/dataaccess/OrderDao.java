@@ -18,28 +18,44 @@ import com.mamezou.shop.util.ApplicationProperties;
  * 
  * @author ito
  */
-public class OrderDao {
+public class OrderDao implements AutoCloseable {
 	/** {@link #insert(Order order)} で使用するSQL */
 	private static final String INSERT_SQL = "INSERT INTO ORDERS (NAME, ADDRESS, TEL_NUMBER, ITEM_ID) VALUES (?, ?, ?, ?)";
 	/** {@link #selectAll()} で使用するSQL */
 	private static final String SELECT_ALL_SQL = "SELECT * FROM ORDERS";
 
-	/** DB接続URL */
-	private String url;
-	/** DB接続ユーザ */
-	private String user;
-	/** DB接続ユーザパスワード */
-	private String password;
+	/** DB接続 */
+	private Connection conn;
 
 	/**
 	 * コンストラクタ
 	 * 
 	 * @param properties JDBC接続情報
 	 */
-	public OrderDao(ApplicationProperties properties) {
-		url = properties.getDatabaseUrl();
-		user = properties.getDatabaseUser();
-		password = properties.getDatabasePassword();
+	public OrderDao(ApplicationProperties properties) throws DaoException {
+		String url = properties.getDatabaseUrl();
+		String user = properties.getDatabaseUser();
+		String password = properties.getDatabasePassword();
+
+		// DB接続
+		try {
+			conn = DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {
+			throw new DaoException("DB接続に失敗しました", e);
+		}
+	}
+
+	/**
+	 * DB接続をクローズする
+	 * @throws DaoException クローズできない場合
+	 */
+	@Override
+	public void close() throws DaoException {
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			throw new DaoException("DB接続の切断に失敗しました", e);
+		}
 	}
 
 	/**
@@ -52,8 +68,7 @@ public class OrderDao {
 	public int insert(Order order) throws DaoException {
 
 		// DB接続
-		try (Connection conn = DriverManager.getConnection(url, user, password);
-				PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+		try (PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 			// バインド
 			ps.setString(1, order.getName());
 			ps.setString(2, order.getAddress());
@@ -87,8 +102,7 @@ public class OrderDao {
 	 */
 	public List<Order> selectAll() throws DaoException {
 		// DB接続
-		try (Connection conn = DriverManager.getConnection(url, user, password);
-				PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
+		try (PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
 				ResultSet rs = ps.executeQuery()) {
 
 			// 結果取得
