@@ -11,5 +11,8 @@
 <body>
 	<h1>注文完了</h1>
 	<p>注文ID : ${orderId}</p>
+
+	<br>
+	<p><a href="./index.html">トップへ戻る</a></p>
 </body>
 </html>
