@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.*;
 
 import com.mamezou.shop.entity.Order;
-import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.util.ApplicationProperties;
 import com.mamezou.shop.util.Environment;
 
