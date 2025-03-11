@@ -17,46 +17,30 @@ import com.mamezou.shop.util.ApplicationProperties;
  * 
  * @author ito
  */
-public class ItemDao implements AutoCloseable {
+public class ItemDao {
 	/** {@link #selectByArea(String)} で使用するSQL */
 	private static final String SELECT_BY_AREA_SQL = "SELECT * FROM ITEMS WHERE AREA = ?";
 	/** {@link #selectAll()} で使用するSQL */
 	private static final String SELECT_ALL_SQL = "SELECT * FROM ITEMS";
 
-	/** DB接続 */
-	private Connection conn;
+	/** DB接続URL */
+	private String url;
+	/** DB接続ユーザ */
+	private String user;
+	/** DB接続パスワード */
+	private String password;
 
 	/**
 	 * コンストラクタ
 	 * @param properties DB接続情報
-	 * @throws DaoException DBに接続できない場合
 	 */
-	public ItemDao(ApplicationProperties properties) throws DaoException {
+	public ItemDao() {
 		// DB接続情報取得
-		String url = properties.getDatabaseUrl();
-		String user = properties.getDatabaseUser();
-		String password = properties.getDatabasePassword();
+		ApplicationProperties properties = ApplicationProperties.getInstance();
+		url = properties.getDatabaseUrl();
+		user = properties.getDatabaseUser();
+		password = properties.getDatabasePassword();
 
-		// DB接続
-		try {
-			conn = DriverManager.getConnection(url, user, password);
-		} catch (SQLException e) {
-			throw new DaoException("DB接続に失敗しました", e);
-		}
-	}
-
-
-	/**
-	 * DB接続をクローズする
-	 * @throws DaoException クローズできない場合
-	 */
-	@Override
-	public void close() throws DaoException {
-		try {
-			conn.close();
-		} catch (SQLException e) {
-			throw new DaoException("DB接続の切断に失敗しました", e);
-		}
 	}
 
 	/**
@@ -68,7 +52,8 @@ public class ItemDao implements AutoCloseable {
 	public List<Item> selectByArea(String area) throws DaoException {
 
 		// DB接続
-		try (PreparedStatement ps = conn.prepareStatement(SELECT_BY_AREA_SQL)) {			
+		try (Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(SELECT_BY_AREA_SQL)) {
 			// バインド
 			ps.setString(1, area);
 
@@ -103,7 +88,8 @@ public class ItemDao implements AutoCloseable {
 	 */
 	public List<Item> selectAll() throws DaoException {
 		// DB接続
-		try (PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL)) {
+		try (Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL)) {
 			// SQL実行
 			try (ResultSet rs = ps.executeQuery()) {
 				// 結果取得

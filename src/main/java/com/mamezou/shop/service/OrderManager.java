@@ -10,28 +10,15 @@ import com.mamezou.shop.entity.Order;
  * 商品情報管理クラス
  * @author ito
  */
-public class OrderManager implements AutoCloseable {
+public class OrderManager {
 	/** Daoオブジェクト */
 	private OrderDao orderDao;
 
 	/**
 	 * コンストラクタ
-	 * @param orderDao 注文情報DAO
 	 */
-	public OrderManager(OrderDao orderDao) {
-		this.orderDao = orderDao;
-	}
-
-	@Override
-	public void close() throws ServiceException {
-		if (orderDao != null) {
-			try {
-				orderDao.close();
-				
-			} catch (DaoException e) {
-				throw new ServiceException("リソースの開放に失敗しました", e);
-			}
-		}
+	public OrderManager() {
+		this.orderDao = new OrderDao();
 	}
 	
 	/**
