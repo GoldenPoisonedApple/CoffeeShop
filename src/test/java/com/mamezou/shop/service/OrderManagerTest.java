@@ -37,7 +37,7 @@ public class OrderManagerTest {
 		// テスト対象クラス作成
 		orderManager = new OrderManager();
 		// モックを挿入
-		Field field = orderDao.getClass().getDeclaredField("orderDao");
+		Field field = orderManager.getClass().getDeclaredField("orderDao");
 		field.setAccessible(true); // アクセス制限を解除
 		field.set(orderManager, orderDao);	// 値を設定
 	}

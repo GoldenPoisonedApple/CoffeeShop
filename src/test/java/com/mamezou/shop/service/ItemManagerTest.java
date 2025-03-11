@@ -34,7 +34,7 @@ public class ItemManagerTest {
 		// テスト対象クラス作成
 		itemManager = new ItemManager();
 		// モックを挿入
-		Field field = itemDao.getClass().getDeclaredField("itemDao");
+		Field field = itemManager.getClass().getDeclaredField("itemDao");
 		field.setAccessible(true); // アクセス制限を解除
 		field.set(itemManager, itemDao);	// 値を設定
 	}
@@ -53,11 +53,11 @@ public class ItemManagerTest {
 	 * 検索結果が0件の場合
 	 */
 	@Test
-	public void testFindByArea_01() throws ServiceException {
+	public void testFindByArea_01() throws ServiceException, DaoException {
 		String findArea = "テスト";
 
 		// スタブとしてのモックの動作を定義
-		when(itemManager.findByArea(findArea)).thenReturn(new ArrayList<>());
+		when(itemDao.selectByArea(findArea)).thenReturn(new ArrayList<>());
 
 		// テスト対象メソッドを実行
 		List<Item> actual = itemManager.findByArea(findArea);
@@ -71,14 +71,14 @@ public class ItemManagerTest {
 	 * 検索結果が1件以上の場合
 	 */
 	@Test
-	public void testFindByArea_02() throws ServiceException {
+	public void testFindByArea_02() throws ServiceException, DaoException {
 		String findArea = "原産1";
 
 		// スタブとしてのモックの動作を定義
 		List<Item> items = new ArrayList<>();
 		items.add(new Item(1, "商品1", "原産1", "原産地1", 500));
 		items.add(new Item(2, "商品2", "原産1", "原産地2", 600));
-		when(itemManager.findByArea(findArea)).thenReturn(items);
+		when(itemDao.selectByArea(findArea)).thenReturn(items);
 
 		// テスト対象メソッドを実行
 		List<Item> actual = itemManager.findByArea(findArea);
@@ -100,11 +100,11 @@ public class ItemManagerTest {
 	 * DaoExceptionが発生した場合
 	 */
 	@Test
-	public void testFindByArea_03() throws ServiceException {
+	public void testFindByArea_03() throws ServiceException, DaoException {
 		String findArea = "テスト";
 
 		// スタブとしてのモックの動作を定義
-		when(itemManager.findByArea(findArea)).thenThrow(new DaoException("データベース関連エラー", new Exception()));
+		when(itemDao.selectByArea(findArea)).thenThrow(new DaoException("データベース関連エラー", new Exception()));
 
 		// テスト対象メソッドを実行
 		Exception exception = assertThrows(ServiceException.class, () -> itemManager.findByArea(findArea));

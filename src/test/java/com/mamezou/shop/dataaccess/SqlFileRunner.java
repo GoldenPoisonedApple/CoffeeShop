@@ -7,9 +7,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
 
+import com.mamezou.shop.entity.Item;
+import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.util.ApplicationProperties;
 
 /**
@@ -59,16 +63,54 @@ public class SqlFileRunner {
 	}
 
 	/**
-	 * 指定したテーブルのデータを取得する.
-	 * 
-	 * @param tableName テーブル名
-	 * @return テーブルのデータ
+	 * 商品情報を全件取得する
+	 * @return 商品情報リスト
 	 * @throws SQLException SQL例外が発生した場合
 	 */
-	public ResultSet getTableData(String tableName) throws SQLException {
+	public List<Item> getAllItem() throws SQLException {
 		// DB接続
-		try (Connection conn = DriverManager.getConnection(url, user, password)) {
-			return conn.createStatement().executeQuery("SELECT * FROM " + tableName);
+		// SQL実行
+		try (Connection conn = DriverManager.getConnection(url, user, password);
+				ResultSet rs = conn.prepareStatement("SELECT * FROM ITEMS").executeQuery()) {
+			
+			// 結果取得
+			List<Item> items = new ArrayList<>();
+			while (rs.next()) {
+				Item item = new Item(
+						rs.getInt("ID"),
+						rs.getString("NAME"),
+						rs.getString("AREA"),
+						rs.getString("ORIGINAL_HOME"),
+						rs.getInt("PRICE"));
+				items.add(item);
+			}
+			return items;
+		}
+	}
+
+	/**
+	 * 注文情報を全件取得する
+	 * @return 注文情報リスト
+	 * @throws SQLException SQL例外が発生した場合
+	 */
+	public List<Order> getAllOrder() throws SQLException {
+		// DB接続
+		// SQL実行
+		try (Connection conn = DriverManager.getConnection(url, user, password);
+				ResultSet rs = conn.prepareStatement("SELECT * FROM ORDERS").executeQuery()) {
+			
+			// 結果取得
+			List<Order> orders = new ArrayList<>();
+			while (rs.next()) {
+				Order order = new Order(
+						rs.getInt("ID"),
+						rs.getString("NAME"),
+						rs.getString("ADDRESS"),
+						rs.getString("TEL_NUMBER"),
+						rs.getInt("ITEM_ID"));
+				orders.add(order);
+			}
+			return orders;
 		}
 	}
 
