@@ -49,6 +49,12 @@ public class ItemDaoTest {
 		// テスト対象クラス
 		itemDao = new ItemDao(ApplicationProperties.getInstance(Environment.TEST));
 	}
+	/** テスト後処理 */
+	@AfterEach
+	public void tearDownEach() throws DaoException {
+		// リソース解放
+		itemDao.close();
+	}
 
 
 	// ------------------------------
@@ -121,4 +127,75 @@ public class ItemDaoTest {
 		assertTrue(exception.getMessage().contains("データベース関連エラー"));
 	}
 
+
+	// ------------------------------
+	// selectAllメソッドのテスト
+	// 全ての商品情報を取得する
+	// ------------------------------
+	/**
+	 * 正常系
+	 * 商品情報が1件もない場合
+	 */
+	@Test
+	public void testSelectAll_02() throws SQLException, DaoException {
+		// テストデータ投入
+		sqlFileRunner.runSqlScript("Items_0data.sql");
+
+		// テスト対象メソッドを実行
+		List<Item> actual = itemDao.selectAll();
+
+		// 結果検証
+		assertEquals(0, actual.size());
+	}
+
+	/**
+	 * 正常系
+	 * 商品情報が1件以上ある場合(3件)
+	 */
+	@Test
+	public void testSelectAll_01() throws SQLException, DaoException {
+		// テストデータ投入
+		sqlFileRunner.runSqlScript("Items_3data.sql");
+
+		// テスト対象メソッドを実行
+		List<Item> actual = itemDao.selectAll();
+
+		// 期待値作成
+		List<Item> expected = Arrays.asList(
+			new Item(1001, "商品1", "原産地1", "原産地域1", 100),
+			new Item(1002, "商品2", "原産地2", "原産地域2", 200),
+			new Item(1003, "商品3", "原産地2", "原産地域3", 300)
+		);
+
+		// 結果検証
+		assertEquals(expected, actual);
+	}
+
+	/**
+	 * 異常系
+	 * java.sql.SQLExceptionが発生した場合
+	 */
+	@Test
+	public void testSelectAll_03() throws Exception {
+		// スタブの作成
+		Connection conn = mock(Connection.class);
+		// スタブの動作を定義
+		try {
+			when(conn.prepareStatement(any())).thenThrow(new SQLException("テスト用例外"));
+		} catch (SQLException e) {
+			fail(e);
+		}
+
+		// テスト対象クラスにスタブを注入
+		// private変数のフィールドを取得
+		Field field = itemDao.getClass().getDeclaredField("conn");
+		// private変数へのアクセス制限を解除
+		field.setAccessible(true);
+		// private変数に値を設定
+		field.set(itemDao, conn);
+
+		// テスト対象メソッドを実行
+		Exception exception = assertThrows(DaoException.class, () -> itemDao.selectAll());
+		assertTrue(exception.getMessage().contains("データベース関連エラー"));
+	}
 }

@@ -20,6 +20,8 @@ import com.mamezou.shop.util.ApplicationProperties;
 public class ItemDao implements AutoCloseable {
 	/** {@link #selectByArea(String)} で使用するSQL */
 	private static final String SELECT_BY_AREA_SQL = "SELECT * FROM ITEMS WHERE AREA = ?";
+	/** {@link #selectAll()} で使用するSQL */
+	private static final String SELECT_ALL_SQL = "SELECT * FROM ITEMS";
 
 	/** DB接続 */
 	private Connection conn;
@@ -70,6 +72,38 @@ public class ItemDao implements AutoCloseable {
 			// バインド
 			ps.setString(1, area);
 
+			// SQL実行
+			try (ResultSet rs = ps.executeQuery()) {
+				// 結果取得
+				List<Item> items = new ArrayList<>();
+				while (rs.next()) {
+					Item item = new Item(
+							rs.getInt("ID"),
+							rs.getString("NAME"),
+							rs.getString("AREA"),
+							rs.getString("ORIGINAL_HOME"),
+							rs.getInt("PRICE"));
+					items.add(item);
+				}
+				
+				// 結果返却
+				return items;
+			}
+
+		} catch (SQLException e) {
+			throw new DaoException("データベース関連エラー", e);
+
+		}
+	}
+
+	/**
+	 * 全てのコーヒー豆情報を取得する
+	 * @return 商品情報リスト
+	 * @throws DaoException SQLExeptionが発生した場合
+	 */
+	public List<Item> selectAll() throws DaoException {
+		// DB接続
+		try (PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL)) {
 			// SQL実行
 			try (ResultSet rs = ps.executeQuery()) {
 				// 結果取得

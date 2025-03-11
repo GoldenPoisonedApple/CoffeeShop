@@ -53,4 +53,21 @@ public class ItemManager implements AutoCloseable {
 			throw new ServiceException("サービス関連エラー", e);
 		}
 	}
+
+	/**
+	 * 商品情報取得
+	 * 
+	 * @return 商品情報リスト
+	 * @throws ServiceException DaoExceptionが発生した場合
+	 */
+	public List<Item> getAll() throws ServiceException {
+		try {
+			// 商品情報取得 返す
+			List<Item> items = itemDao.selectAll();
+			return items;
+
+		} catch (DaoException e) {
+			throw new ServiceException("サービス関連エラー", e);
+		}
+	}
 }
