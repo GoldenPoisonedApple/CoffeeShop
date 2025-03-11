@@ -34,11 +34,14 @@ DaoオブジェクトでのDBからのエラーのテストはDriverManagerの�
 Item系統はConnectionを長引かせ、リソースを気にしてみた。
 Connectionが重いらしいので使いまわそうと
 ItemDaoのリソース管理を色々やってみて惨敗
-汚い
+汚い > 綺麗にした
 Factory使った方がいいと思う
 
 Order系統はConnectionの粒度を細かくしている。
 
+
+## 言語切り替え機能
+Viewのソースが非常に見にくいので普通にフレームワーク使った方が良かったと思う
 
 # Version情報
 Tomcat 10.1
