@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.mamezou.shop.entity.Order;
 import com.mamezou.shop.service.OrderManager;
 import com.mamezou.shop.service.ServiceException;
+import com.mamezou.shop.util.HtmlEscapeUtil;
 
 /**
  * 商品情報検索サーブレット
@@ -28,6 +29,10 @@ public class OrderServlet extends HttpServlet {
 		String name = request.getParameter("name");
 		String address = request.getParameter("address");
 		String telNumber = request.getParameter("telNumber");
+		// HTMLエスケープ処理
+		name = HtmlEscapeUtil.escapeHtml(name);
+		address = HtmlEscapeUtil.escapeHtml(address);
+		telNumber = HtmlEscapeUtil.escapeHtml(telNumber);
 
 		// 注文情報生成
 		Order order = new Order(name, address, telNumber, itemId);
